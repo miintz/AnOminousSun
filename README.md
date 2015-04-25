@@ -1,5 +1,7 @@
 # An Ominous Sun
 #### NMNT side project
+<br/>
+An interactive set-piece where the content is the observer's musical taste.
 
 <br/>
 Uses these beauties: <br/>
