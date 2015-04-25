@@ -26,7 +26,7 @@ namespace LyrSer
 {
     public partial class ControlCenter : Form
     {
-        String MusixAPI = "a521cb8d087de3e7978da22b104fd880";
+        String MusixAPI = "";
         Dictionary<string, double> GenreEvilness = new Dictionary<string, double>();
         public ControlCenter()
         {
