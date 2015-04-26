@@ -60,6 +60,7 @@
     <Compile Include="ControlCenter.Designer.cs">
       <DependentUpon>ControlCenter.cs</DependentUpon>
     </Compile>
+    <Compile Include="JsonObjects\LyrOut.cs" />
     <Compile Include="JsonObjects\MusicBrainzArtist.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

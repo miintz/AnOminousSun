@@ -43,7 +43,7 @@ namespace LyrSer
             rtMatched.Text = ""; //and this
             lblStatus.Text = ""; //and then also this
             lblGenre.Text = ""; //yeah this as well
-            lblEvilness.Text = ""; //while you're at it...
+            lblEvilness.Text = ""; //while you're at it
 
             this.Refresh();
 
@@ -151,12 +151,14 @@ namespace LyrSer
             Uri ArtistUri = new Uri("https://musicbrainz.org/ws/2/artist/?query=artist:" + BandName + "&fmt=json");
             String ArtistJson = String.Empty;
             MusicBrainzArtist RetrievedArtistObject = new MusicBrainzArtist();
+
+            //musicbrainz gives 502 and 503 errors, their servers are a bit overloaded sometimes
             try
             {
                 WebClient client = new WebClient();
 
                 //we need to add user-agent header else MusicBrainz will slam the door in our faces, and rightly so
-                client.Headers.Add("user-agent", "NMNT.LyrSer/1.0");
+                client.Headers.Add("user-agent", "NMNT.AnOminousSun/1.1");
                 ArtistJson = client.DownloadString(ArtistUri);
 
                 //3.4 if we have a Json we can deserialize this into the object, this may throw error if we get the Bad Gateway page (that's not Json)
@@ -268,7 +270,7 @@ namespace LyrSer
                         }
                     }
 
-                    Evilness = Evilness / Genre;
+                    Evilness = Evilness / Genre; 
                     Evilness = Math.Round(Evilness, 2);
                 }
             }
@@ -276,10 +278,80 @@ namespace LyrSer
             if (Evilness.ToString() == "NaN" || Evilness == 0.0)
             {
                 Evilness = 5.0;
-                lblGenre.Text = "None found";
+                lblGenre.Text = "None found (maybe MusicBrainz threw a 502, may work again later)";
             }
 
             lblEvilness.Text = Evilness.ToString();
+            lblMsg.Text = "Writing to file!";
+
+            //6. Ok all done, now we need to write it to a text file somewhere. theres a max of 5 streams so we need to check which one is available
+            //we do this by checking file creation data
+
+            int ThreadNumber = 0;
+            String Latest = String.Empty;
+
+            if (!Directory.Exists("./LyrOut/"))
+            { 
+                //ok, so this doesnt exist. ezpz then
+                Directory.CreateDirectory("./LyrOut/");
+
+                //also write 10 files for the lyrics so the next bit is a little easier
+                for (int i = 0; i < 10; i++)
+                {                    
+                    FileStream outf = System.IO.File.Create("./LyrOut/lyrout-" + i.ToString() + ".txt");
+                    outf.Close(); //we need to close this now
+                }
+            }
+            else
+            {                
+                //get oldest files
+                FileInfo fileinf = new DirectoryInfo("./LyrOut/").EnumerateFiles().OrderByDescending(x => x.LastWriteTime).Reverse().ToList().First();
+ 
+                //seems as if we took the second route
+                String[] parts = fileinf.Name.Split(new char[] { '-' } );
+               
+                //split again
+                String[] parts1 = parts[1].Split(new char[] { '.' });
+
+                //first part should be theadnumber
+                ThreadNumber = Int32.Parse(parts1[0]);                
+            }
+
+            //now we should have the theadnumber one way or another, we can write to file now
+
+            //so... write to file, but first create it!
+            String FileName = "./LyrOut/lyrout-" + ThreadNumber.ToString() + ".txt";
+            FileStream f = System.IO.File.Create(FileName); 
+            f.Close(); //we need to close this
+          
+            lblOutFileN.Text = ThreadNumber.ToString(); 
+
+            //now stream lycs to the new file
+            using (StreamWriter Writer = new StreamWriter(FileName))
+            {
+                String Complete = String.Empty;
+                //get lines
+
+                foreach(String line in rtLyrics.Lines)
+                {
+                    Complete += line + "\r\n";
+                }
+                
+                LyrOut lyr = new LyrOut();
+                lyr.Evilness = lblEvilness.Text.ToString();
+                lyr.Genres = lblGenre.Text.ToString();
+                lyr.Lyrics = Complete;
+
+                //write this as JSON, so we can parse it later on in any language
+                string output = JsonConvert.SerializeObject(lyr);
+                Writer.Write(output);
+
+                Writer.Close();
+                Writer.Dispose();
+            }
+            
+            //done writing lyrics
+
             lblMsg.Text = "OK!";
             this.Refresh();
         }

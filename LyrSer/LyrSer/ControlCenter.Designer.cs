@@ -39,6 +39,8 @@
             this.lblGenre = new System.Windows.Forms.Label();
             this.lblEvilness = new System.Windows.Forms.Label();
             this.lblMsg = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.lblOutFileN = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnReadText
@@ -137,11 +139,31 @@
             this.lblMsg.Size = new System.Drawing.Size(0, 13);
             this.lblMsg.TabIndex = 10;
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(12, 484);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(47, 13);
+            this.label3.TabIndex = 11;
+            this.label3.Text = "Number:";
+            // 
+            // lblOutFileN
+            // 
+            this.lblOutFileN.AutoSize = true;
+            this.lblOutFileN.Location = new System.Drawing.Point(67, 484);
+            this.lblOutFileN.Name = "lblOutFileN";
+            this.lblOutFileN.Size = new System.Drawing.Size(13, 13);
+            this.lblOutFileN.TabIndex = 12;
+            this.lblOutFileN.Text = "0";
+            // 
             // ControlCenter
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(680, 649);
+            this.Controls.Add(this.lblOutFileN);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.lblMsg);
             this.Controls.Add(this.lblEvilness);
             this.Controls.Add(this.lblGenre);
@@ -173,6 +195,8 @@
         private System.Windows.Forms.Label lblGenre;
         private System.Windows.Forms.Label lblEvilness;
         private System.Windows.Forms.Label lblMsg;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label lblOutFileN;
     }
 }
 
