@@ -30,8 +30,7 @@ class NoiseField implements AppletInterface
       if (NUM_PARTICLES < 0)
         NUM_PARTICLES = 1000;
 
-      p.updateParticleList();
-      println(NUM_PARTICLES);
+      p.updateParticleList();    
     }
 
     p.update();
