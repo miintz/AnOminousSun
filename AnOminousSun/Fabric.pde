@@ -24,12 +24,12 @@ public class Fabric implements AppletInterface
 
   // Dimensions for our curtain. These are number of particles for each direction, not actual widths and heights
   // the true width and height can be calculated by multiplying restingDistances by the curtain dimensions
-  final int curtainHeight = 56;
-  final int curtainWidth = 80;
-  final int yStart = 25; // where will the curtain start on the y axis?
-  final float restingDistances = 5;
+  final int curtainHeight = 92; //het rekt wat uit
+  final int curtainWidth = 98;
+  final int yStart = 0; // where will the curtain start on the y axis?
+  final float restingDistances = 10;
   final float stiffnesses = 1;
-  final float curtainTearSensitivity = 50; // distance the particles have to go before ripping
+  final float curtainTearSensitivity = 75; // distance the particles have to go before ripping
 
   // These variables are used to keep track of how much time is elapsed between each frame
   // they're used in the physics to maintain a certain level of accuracy and consistency
@@ -50,8 +50,10 @@ public class Fabric implements AppletInterface
 
   // instructional stuffs:
   PFont font;
+
   final int instructionLength = 3000;
   final int instructionFade = 300;
+
   void setup () {
     // I find that P2D is the fastest renderer for 2D graphics
     // OPENGL may be faster for some people
@@ -70,7 +72,7 @@ public class Fabric implements AppletInterface
   }
 
   void draw () {
-    background(255);
+    background(0);
 
     /******** Physics ********/
     // time related stuff
@@ -115,10 +117,10 @@ public class Fabric implements AppletInterface
 
     if (millis() < instructionLength)
       drawInstructions();
-      
   }
-  
+
   void createCurtain () {
+
     // We use an ArrayList instead of an array so we could add or remove particles at will.
     // not that it isn't possible using an array, it's just more convenient this way
     particles = new ArrayList();
@@ -177,9 +179,10 @@ public class Fabric implements AppletInterface
       gravity = 392;
   }
   void keyReleased()
-  {}
-  
-  
+  {
+  }
+
+
   void drawInstructions () {
     float fade = 255 - (((float)millis()-(instructionLength - instructionFade)) / instructionFade) * 255;
     stroke(0, fade);
@@ -276,14 +279,37 @@ public class Fabric implements AppletInterface
 
     void draw () {
       // draw the links and points
-      stroke(0);
+
+      //maar niet als ze buiten die cirkel vallen
+      float y = 0;
+      float x = 0;
+
+      int Cx = width / 2;
+      int Cy = height / 2;
+
+      int radius = width / 2;
+
+      stroke(255);
       if (links.size() > 0) {
         for (int i = 0; i < links.size (); i++) {
           Link currentLink = (Link) links.get(i);
-          currentLink.draw();
+          
+          //heeft 2 particles
+          x = currentLink.p1.position.x;
+          y = currentLink.p1.position.y;
+          
+          if (pow((x - Cx), 2) + pow((y - Cy), 2) < pow(radius, 2))        
+            currentLink.draw();
         }
       } else
-        point(position.x, position.y);
+      {
+        //(hier maar eens beginnen)
+        x = position.x;
+        y = position.y;
+        
+        if (pow((x - Cx), 2) + pow((y - Cy), 2) < pow(radius, 2))        
+          point(position.x, position.y);        
+      }
     }
     /* Constraints */
     void solveConstraints () {
@@ -337,8 +363,8 @@ public class Fabric implements AppletInterface
     float restingDistance;
     float stiffness;
 
-    Particle p1;
-    Particle p2;
+    public Particle p1;
+    public Particle p2;
 
     // the scalars are how much "tug" the particles have on each other
     // this takes into account masses and stiffness, and are set in the Link constructor
@@ -386,4 +412,3 @@ public class Fabric implements AppletInterface
     }
   }
 }
-

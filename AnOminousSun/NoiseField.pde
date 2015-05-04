@@ -65,6 +65,7 @@ class NoiseField implements AppletInterface
     {
       velocity.x = 20*(noise(mouseX/10+position.y/100)-0.5);
       velocity.y = 20*(noise(mouseY/10+position.x/100)-0.5);
+      
       position.add(velocity);
 
       if (position.x<0)position.x+=width;

@@ -10,14 +10,15 @@ void setup()
 
   Visuals.add(new DummyVisual()); //dummy
   
-  MultiscaleTuring Turing = new MultiscaleTuring();
-  Turing.setup();  
-
-  Visuals.add(Turing); 
   
   Fabric FabricSim = new Fabric();
   FabricSim.setup();  
   Visuals.add(FabricSim);
+  
+  MultiscaleTuring Turing = new MultiscaleTuring();
+  Turing.setup();  
+  Visuals.add(Turing); 
+  
   
   NoiseField Noise = new NoiseField();
   Noise.setup();  
