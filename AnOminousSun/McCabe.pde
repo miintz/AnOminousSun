@@ -68,14 +68,18 @@ class McCabe implements AppletInterface
   }
 
   void draw() {
+    
     symmetry();
     calculatePattern();
+    
     background(255);
+    
     renderPattern(buffer);
     drawImage(buffer);
+    
     //drawControls();
     interaction();  
-    // if(frameCount % 20 == 0) println(frameRate);
+    // if(frameCount % 20 == 0) frameRate);
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -91,13 +95,14 @@ class McCabe implements AppletInterface
   }
 
   void drawImage(PImage img) {
-    pushMatrix();
-    translate(spacing, spacing);
+    //pushMatrix();
+    //translate(spacing, spacing);
     noFill();
     stroke(0);
-    rect(-1, -1, imgWidth+1, imgHeight+1);
-    image(img, 0, 0, imgWidth, imgHeight);
-    popMatrix();
+    //rect(-1, -1, imgWidth+1, imgHeight+1);
+    image(img, 0, 0, width, height);
+    
+    //popMatrix();
   }
 
   ////////////////////////////// setup ////////////////////////////////////////
@@ -458,8 +463,27 @@ class McCabe implements AppletInterface
   void keyReleased()
   {}  
   
-  void keyPressed() {
-
+  void keyPressed() {      
+    
+    switch(keyCode)
+    {
+      case 72:
+        randomizeParams();
+        break;
+      case 76:
+        resolution = 4;
+        resetParams(); 
+      break;
+      case 75: //kwart resolution
+        resolution = 2;
+        resetParams(); 
+      break;
+      case 74: //h
+        resolution = 1;
+        resetParams(); 
+      break;
+    }
+      
     switch( key ) {
 
     case ' ': 
@@ -478,6 +502,7 @@ class McCabe implements AppletInterface
       resetParams(); 
       break;
     case 'h': 
+    println("H");
       resolution = 1; 
       resetParams(); 
       break;
@@ -530,7 +555,7 @@ class McCabe implements AppletInterface
     blurFactor = constrain(blurFactor, 0, 1);
 
     updateParams(); 
-    updateControls();
+    //updateControls();
   }
 
 
@@ -571,12 +596,14 @@ class McCabe implements AppletInterface
     // set resolution; 
     imgWidth = (width - controlWidth - 3 * spacing) ;
     imgHeight = (height - 2 * spacing);  
-    w = imgWidth / resolution;
-    h = imgHeight / resolution;
-
+    
+    //dit moet hele scherm zijn
+    w = /*imgWidth*/ height / resolution;
+    h = /*imgHeight*/ width / resolution;
 
     // allocate space
     n = w * h;
+    
     grid = new float[n];
     diffusionLeft = new float[n];
     diffusionRight = new float[n];
@@ -709,15 +736,45 @@ class McCabe implements AppletInterface
 
   void renderPattern(PImage img) {
     img.loadPixels();
+    
     color[] pixels = buffer.pixels;
+    
     gmin = invertMode ? -1 : +1;
     gmax = invertMode ? +1 : -1;
+    
+    int Y = 0;
+    
+    //cirkel...
+    int y = 0;
+    int x = 0;
+
+    int Cx = (width / 2) / resolution;
+    int Cy = (height / 2) / resolution;
+
+    int radius = (width / 2) / resolution;
+    
     for (int i = 0; i < n; i++) {
+
+      if (i < width / resolution)     
+        y = 0;
+      else
+        y = ceil(i / (width / resolution));
+
+      x = i % (width / resolution); 
+   
+      //HBS kleuren
       float h = int(map(colorgrid[i], gmin, gmax, 0, 127) + colorOffset)  % 256;
       float b = map(grid[i], gmin, gmax, 0, 255);
       float s = (255-b) / 2;
-      pixels[i] = colMode ? color(h, s, b) : color(b);
+      
+      //niet doen als het niet in de cirkel zit. 
+      if (pow((x - Cx), 2) + pow((y - Cy), 2) < pow(radius, 2))
+        pixels[i] = colMode ? color(h, s, b) : color(b);
+      else
+        pixels[i] = color(0);
+        
     }
+    
     img.updatePixels();
   }
 

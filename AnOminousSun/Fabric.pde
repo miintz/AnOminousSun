@@ -166,10 +166,10 @@ public class Fabric implements AppletInterface
   }
 
   // Controls. The r key resets the curtain, g toggles gravity
-  void keyPressed() {
-    if ((key == 'r') || (key == 'R'))
+  void keyPressed() {    
+    if(keyCode == 82)    
       createCurtain();
-    if ((key == 'g') || (key == 'G'))
+    if (keyCode == 72)
       toggleGravity();
   }
   void toggleGravity () {

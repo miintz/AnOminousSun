@@ -7,10 +7,19 @@ int DrawThisOne = 1;
 
 void setup()
 {
-  size(1000, 1000, P2D);
+  size(1000, 1000, P3D); //P3D heeft ook de P2D functies blijkbaar 
 
   Visuals.add(new DummyVisual()); //dummy
 
+  BodyCells Cells = new BodyCells();
+  Cells.that = this;
+  Cells.setup();
+  Visuals.add(Cells);
+  
+  NoiseField Noise = new NoiseField();
+  Noise.setup();  
+  Visuals.add(Noise);
+  
   McCabe Cabe = new McCabe();
   Cabe.setup();
   Visuals.add(Cabe);
@@ -22,10 +31,6 @@ void setup()
   MultiscaleTuring Turing = new MultiscaleTuring();
   Turing.setup();  
   Visuals.add(Turing); 
-  
-  NoiseField Noise = new NoiseField();
-  Noise.setup();  
-  Visuals.add(Noise);  
 }
 
 void draw()
