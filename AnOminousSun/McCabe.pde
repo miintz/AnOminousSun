@@ -30,7 +30,9 @@ class McCabe implements AppletInterface
   RadioButton radio;
   Textlabel label;
   Slider slider;
-
+  
+  PImage Mask;
+  
   final static int CONTROLLER = 0, TAB = 1, GROUP = 2;
   final static int RESOLUTION = 1, SYMMETRY = 2, OPTIONS = 3, BRUSH = 4;
   final static int STEP_OFFSET = 5, STEP_SCALE = 6, COLOR_OFFSET = 7, BLUR_LEVEL = 8;
@@ -59,7 +61,7 @@ class McCabe implements AppletInterface
   void setup() {
     //size(800, 500, P2D);
     //size(720, 600, P2D);
-    
+    Mask = loadImage("mask.png");
     resetParams();
     //setupControls(); hier gaat het mis mee (nullpointer oid) ik heb deze toch niet echt nodig
     updateControls();
@@ -80,6 +82,8 @@ class McCabe implements AppletInterface
     //drawControls();
     interaction();  
     // if(frameCount % 20 == 0) frameRate);
+    
+    image(Mask, 0,0);
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -101,7 +105,7 @@ class McCabe implements AppletInterface
     stroke(0);
     //rect(-1, -1, imgWidth+1, imgHeight+1);
     image(img, 0, 0, width, height);
-    
+    filter(GRAY);
     //popMatrix();
   }
 
@@ -751,7 +755,7 @@ class McCabe implements AppletInterface
     int Cx = (width / 2) / resolution;
     int Cy = (height / 2) / resolution;
 
-    int radius = (width / 2) / resolution;
+    int radius = ((width / 2) / resolution) + 25;
     
     for (int i = 0; i < n; i++) {
 

@@ -11,7 +11,9 @@
 public class Fabric implements AppletInterface 
 {
   ArrayList particles;
-
+  
+  PImage Mask;
+  
   // every particle within this many pixels will be influenced by the cursor
   float mouseInfluenceSize = 15; 
   // minimum distance for tearing when user is right clicking
@@ -68,6 +70,7 @@ public class Fabric implements AppletInterface
     createCurtain();
 
     font = loadFont("LucidaBright-Demi-16.vlw");
+    Mask = loadImage("mask.png");
     textFont(font);
   }
 
@@ -117,6 +120,9 @@ public class Fabric implements AppletInterface
 
     if (millis() < instructionLength)
       drawInstructions();
+      
+    image(Mask,0,0);
+      
   }
 
   void createCurtain () {

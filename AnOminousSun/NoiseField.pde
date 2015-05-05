@@ -6,7 +6,8 @@ class NoiseField implements AppletInterface
   int NUM_PARTICLES = 1000;
 
   ParticleSystem p;
-
+  PImage Mask;
+  
   void setup()
   {
     smooth();
@@ -14,12 +15,15 @@ class NoiseField implements AppletInterface
     background(0);
 
     p = new ParticleSystem();
+    
+    Mask = loadImage("mask.png");
   }
 
   void draw()
   {   
     noStroke();
-
+    rectMode(CORNER);
+    
     fill(0, 5);
     rect(0, 0, width, height);
 
@@ -35,6 +39,8 @@ class NoiseField implements AppletInterface
 
     p.update();
     p.render();
+    
+    image(Mask, 0,0);
   }
 
   void keyPressed()
