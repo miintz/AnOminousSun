@@ -10,8 +10,11 @@ void setup()
 {
   size(1000, 1000, P3D); //P3D heeft ook de P2D functies blijkbaar 
 
-  //Visuals.add(new DummyVisual()); //dummy
-
+  Visuals.add(new DummyVisual()); //dummy
+  
+  Knitting Knitter = new Knitting();
+  Knitter.setup();
+  Visuals.add(Knitter);
   
   BodyCells Cells = new BodyCells();
   Cells.that = this;
@@ -38,6 +41,10 @@ void setup()
   Lett.setup();
   Visuals.add(Lett);
     
+  Waver Wave = new Waver();
+  Wave.setup();
+  Visuals.add(Wave);  
+    
   //deze centered niet zo goed
   //Octo Oct = new Octo();
   //Oct.setup();
@@ -58,29 +65,30 @@ void draw()
   if(frameCount % 5 == 0)
   {
     int f = (int)round(random(0,2));
-    println(f);
     
-    switch(f)
-    {
-      case 0:
-        filter(DILATE);
-      break;
-      case 1:
-        filter(ERODE);
-      break;
-      case 2:
-        filter(POSTERIZE, 4);
-      break;      
-    }  
+//    switch(f)
+//    {
+//      case 0:
+//        filter(DILATE);
+//      break;
+//      case 1:
+//        filter(ERODE);
+//      break;
+//      case 2:
+//        filter(POSTERIZE, 4);
+//      break;      
+//    }  
   }
 }
+
 boolean ctrlPressed;
+
 void keyPressed()
 {
   Visuals.get(DrawThisOne).keyPressed();
   
   if(!ctrlPressed) //possibly cntrl
-  {      
+  {          
     int k = int(str((char)key));
     if(k != 0 && Visuals.size() > k)
     {
