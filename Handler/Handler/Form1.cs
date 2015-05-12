@@ -21,7 +21,7 @@ namespace Handler
         public Form1()
         {
             InitializeComponent();
-            port = new SerialPort("COM4", 57600);
+            port = new SerialPort("COM3", 57600);
             try
             {
                 //un-comment this line to cause the arduino to re-boot when the serial connects
@@ -32,13 +32,19 @@ namespace Handler
             catch (Exception ex)
             {
                 //alert the user that we could not connect to the serial port
+                this.Close();
             }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            port.Write("a"); //listen loop on;
+            port.Write("x");
+            port.Write("y");
 
+            port.Write("a"); //listen loop on;
+            port.Write("b");
+
+            port.Write("z");
             //etc
         }
     }
