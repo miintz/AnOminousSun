@@ -29,8 +29,16 @@ namespace Handler
             InitializeComponent();
 
         }
+
+        public void SetMicrophoneMonitorInstance(MicrophoneMonitor m)
+        {
+            Monitor = m;
+        }
+
         private void button1_Click(object sender, EventArgs e)
-        {           
+        {
+            Monitor.StartMic();
+
             port = new SerialPort("COM3", 57600);
 
             try

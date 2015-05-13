@@ -9,12 +9,14 @@ using System.Threading.Tasks;
 
 namespace Handler
 {
-    class MicrophoneMonitor : Microsoft.Xna.Framework.Game
+    public class MicrophoneMonitor : Microsoft.Xna.Framework.Game
     {
         public static Rectangle windowRect;
 
         Microphone MainIn;
         byte[] MainInBuffer;
+
+        public GraphicsDeviceManager graphics { get; set; }
 
         public MicrophoneMonitor()
         {
@@ -25,22 +27,13 @@ namespace Handler
             MainInBuffer = new byte[MainIn.GetSampleSizeInBytes(MainIn.BufferDuration)];
             MainIn.BufferReady += MainIn_BufferReady;
 
-            base.Run();
-            
+            //no need to see it really...
+            graphics = new GraphicsDeviceManager(this);
+            graphics.PreferredBackBufferHeight = 250;
+            graphics.PreferredBackBufferWidth = 250;
+
         }
 
-        public void f_LocationChanged(object sender, EventArgs e)
-        {
-            var FakeWindow = sender as System.Windows.Forms.Form;
-
-            var drawClientArea = FakeWindow.RectangleToScreen(
-                                   FakeWindow.ClientRectangle);
-            windowRect = new Rectangle(
-                       drawClientArea.X,
-                       drawClientArea.Y,
-                       drawClientArea.Width,
-                       drawClientArea.Height);
-        }
 
         protected override void Dispose(bool disposing)
         {
@@ -63,8 +56,22 @@ namespace Handler
         }
 
         protected override void Update(Microsoft.Xna.Framework.GameTime gameTime)
-        {
-            base.Update(gameTime);   
+        {            
+            base.Update(gameTime);
         }
+
+        public void f_LocationChanged(object sender, EventArgs e)
+        {
+            var FakeWindow = sender as System.Windows.Forms.Form;
+
+            var drawClientArea = FakeWindow.RectangleToScreen(
+                                   FakeWindow.ClientRectangle);
+            windowRect = new Rectangle(
+                       drawClientArea.X,
+                       drawClientArea.Y,
+                       drawClientArea.Width,
+                       drawClientArea.Height);
+        }
+
     }
 }
