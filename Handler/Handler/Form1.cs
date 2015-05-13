@@ -7,21 +7,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
-using Phidget21COM;
 using System.Threading;
 using System.IO.Ports;
 
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework;
+using System.IO;
+
+using GdiColor = System.Drawing.Color;
+using XnaColor = Microsoft.Xna.Framework.Color;
+
 namespace Handler
 {
-    public partial class Form1 : Form
+    public partial class Handler : Form
     {
         SerialPort port;
+        MicrophoneMonitor Monitor;
 
-        public Form1()
+        public Handler()
         {
             InitializeComponent();
+
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {           
             port = new SerialPort("COM3", 57600);
+
             try
             {
                 //un-comment this line to cause the arduino to re-boot when the serial connects
@@ -33,19 +44,38 @@ namespace Handler
             {
                 //alert the user that we could not connect to the serial port
                 this.Close();
+                this.Dispose();
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            port.Write("x");
-            port.Write("y");
+        private void ArmListener()
+        { 
+            //9
+        }
 
-            port.Write("a"); //listen loop on;
-            port.Write("b");
+        private void FireListener()
+        { 
+        
+        }
 
-            port.Write("z");
-            //etc
+        private void ResetListener()
+        { 
+        
+        }
+
+        private void ArmBacker()
+        { 
+            //10
+        }
+
+        private void FireBacker()
+        { 
+        
+        }
+
+        private void ResetBacker()
+        { 
+            
         }
     }
 }
