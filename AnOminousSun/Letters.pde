@@ -9,24 +9,17 @@ class Letters implements AppletInterface
    * Click to restart.
    */
 
-  /*
-    letters geeft een array out of bounds ergens
-  */
-
   PFont font;
   float currentSize;
-  PImage Mask;
-  
-  void setup() {    
-    
-    //colorMode(HSB, TWO_PI, 1, 1, 1);
+
+  void setup() {
+    //size(500, 500);
+    colorMode(HSB, TWO_PI, 1, 1, 1);
     
     initFont();
     smooth();
 
     initialize();
-    
-    Mask = loadImage("mask.png");
   }
 
   void initFont() {
@@ -36,14 +29,22 @@ class Letters implements AppletInterface
     } 
     font = createFont("MyFont", 200, true, chars);
   }
-
-  void draw() {
+  
+  void drawString(String word, PFont Active)
+  {
     if (currentSize > 10) {
-      if (!randomLetter(currentSize)) {
+      if (!randomLetter(currentSize, word, Active)) {
         currentSize = currentSize*0.95;
       }
     }
-    
+  }
+  
+  void draw() {
+//    if (currentSize > 10) {
+//      if (!randomLetter(currentSize)) {
+//        currentSize = currentSize*0.95;
+//      }
+//    }
   }
 
   void initialize() {
@@ -58,13 +59,15 @@ class Letters implements AppletInterface
   void keyPressed() {
     initialize();
   }
-  
+
   void keyReleased()
   {}
-
-  boolean randomLetter(float letterSize) {
+  
+  boolean randomLetter(float letterSize, String word, PFont font2) {
     int intSize = (int)letterSize;
-
+    
+    font = font2;
+    
     PGraphics g = createGraphics(intSize, intSize, JAVA2D);
     g.beginDraw();
     g.background(color(0, 0, 1, 0));
@@ -72,9 +75,10 @@ class Letters implements AppletInterface
     g.textAlign(CENTER, CENTER);
     g.translate(letterSize/2, letterSize/2);
     g.rotate(random(TWO_PI));
-    g.scale(letterSize/300);
+    g.scale(letterSize/150);    
     g.textFont(font);
-    g.text((char)random('A', 'Z'+1), 0, 0);
+    //g.text((char)random('A', 'Z'+1), 0, 0);
+    g.text(word, 0, 0);
     g.endDraw();
 
     PGraphics gMask = createGraphics(intSize, intSize, JAVA2D);

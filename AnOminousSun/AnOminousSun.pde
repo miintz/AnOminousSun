@@ -37,6 +37,7 @@ PImage bck;
 PImage Mask;
 PImage MaskInv;
 
+Letters fitter;
 
 void setup()
 { 
@@ -56,38 +57,44 @@ void setup()
 
   Visuals.add(new DummyVisual()); //dummy
 
+  //  Letters Lett = new Letters();  
+  //  Lett.setup();
+  //  Visuals.add(Lett);
+
+  fitter = new Letters();
+  fitter.setup();
+
+
   BodyCells Cells = new BodyCells();
   Cells.that = this;
   Cells.setup();
   Visuals.add(Cells);
 
-//  NoiseField Noise = new NoiseField();
-//  Noise.setup();  
-//  Visuals.add(Noise);
-//
-//  Knitting Knitter = new Knitting();
-//  Knitter.setup();
-//  Visuals.add(Knitter);
-//
-//  McCabe Cabe = new McCabe();
-//  Cabe.setup();
-//  Visuals.add(Cabe);
-//
-//  Fabric FabricSim = new Fabric();
-//  FabricSim.setup();  
-//  Visuals.add(FabricSim);
-//
-//  Doodle Doodoo = new Doodle();
-//  Doodoo.setup();
-//  Visuals.add(Doodoo);
-//
-//  Letters Lett = new Letters();
-//  Lett.setup();
-//  Visuals.add(Lett);
-//
-//  Waver Wave = new Waver();
-//  Wave.setup();
-//  Visuals.add(Wave);  
+  //  NoiseField Noise = new NoiseField();
+  //  Noise.setup();  
+  //  Visuals.add(Noise);
+  //
+  //  Knitting Knitter = new Knitting();
+  //  Knitter.setup();
+  //  Visuals.add(Knitter);
+  //
+  //  McCabe Cabe = new McCabe();
+  //  Cabe.setup();
+  //  Visuals.add(Cabe);
+  //
+  //  Fabric FabricSim = new Fabric();
+  //  FabricSim.setup();  
+  //  Visuals.add(FabricSim);
+  //
+  //  Doodle Doodoo = new Doodle();
+  //  Doodoo.setup();
+  //  Visuals.add(Doodoo);
+  //
+
+  //
+  //  Waver Wave = new Waver();
+  //  Wave.setup();
+  //  Visuals.add(Wave);  
 
   //deze centered niet zo goed
   //Octo Oct = new Octo();
@@ -101,7 +108,7 @@ void setup()
   //erg traag
 
   LoadFonts();
-  LoadFileList();  
+  LoadFileList();
 }
 
 
@@ -116,11 +123,12 @@ void draw()
   //teksten zijn een x aantal seconden geldig, dan moet file leeg?
 
   Visuals.get(DrawThisOne).draw();
+  //AnOminousSun(); //plaatje voor de text...
 
   loadPixels();
   //mask pixels
 
-  PImage frame = createImage(width, height, RGB);
+    PImage frame = createImage(width, height, RGB);
   frame.loadPixels();
 
   for (int z = 0; z < (width*height); z++)
@@ -134,8 +142,8 @@ void draw()
 
   frame.mask(Mask);
   image(frame, 0, 0);      
-  doSwirlyDo();
 
+  doSwirlyDo();
   AnOminousSun();
   
   //image(Mask,0,0); 
@@ -146,72 +154,72 @@ void draw()
 
 void AnOminousSun()
 {    
-  for(int i = 0; i < ALO_SHOW; i++)
+  if (frameCount % 5 == 0)
   {
-    fill(0); 
-    
-    if(ActiveLyrisObjects[i] == null)
-      continue;
-      
-    textFont(ActiveLyricObjects[i].ActiveFont); //random font
-    textSize(ACTIVE_FONTSIZE);   
-    text(ActiveLyricObjects[i].returnCurrent(), 500, 500 + (i * 50));
-    
-    if(frameCount % ActiveLyricObjects[i].Evilness == 0)
-    {      
-      ACTIVE_FONTSIZE = (int)ceil(random(22, 32));
-    }
-    
-    if(frameCount % 7 == 0)
-    {      
-      int font = (int)ceil(random(0,LyricFonts.size() - 1));      
-      ActiveLyricObjects[i].ActiveFont = LyricFonts.get(font);
-    }
-    
-    if(frameCount % L_WORDTIME == 0)
+    for (int i = 0; i < ALO_SHOW; i++)
     {
-       word++;
-    }
-    
-    if(frameCount % L_SWAPTIME == 0)
-    {
-       ActiveLyricObjects[i].Progress += 3;     
-       word = 0;
-    }
-    
-    Boolean dontreset = false;
-    if(frameCount % ALO_SWAPTIME == 0)
-    {
-      //de swap is hier, mss moeten we een object verwijderen
-      if(ActiveLyricObjects[i].Invalidated)
-      {        
-        if(ALO_SHOW != LyricObjects.size()
-        {        
-          LyricObjects.remove(ActiveLyricObjects[i].Index);       
-        }
-        else
-          dontreset = true;
-        //no more objects
-        
-        if(ALO_SHOW > LyricObjects.size())
-        {
-          ALO_SHOW = LyricObjects.size();  
-          println("reset: " + ALO_SHOW);
-        }
-        
-        println("removed: " + i + " new size: " + LyricObjects.size());
+      fill(0); 
+
+      if (ActiveLyricObjects[i] == null)
+        continue;
+
+      fitter.drawString(ActiveLyricObjects[i].returnCurrent(), ActiveLyricObjects[i].ActiveFont);
+
+      //textFont(ActiveLyricObjects[i].ActiveFont); //random font
+      //textSize(ACTIVE_FONTSIZE);   
+      //text(ActiveLyricObjects[i].returnCurrent(), 500, 500 + (i * 50));
+
+      if (frameCount % ActiveLyricObjects[i].Evilness == 0)
+      {      
+        ACTIVE_FONTSIZE = (int)ceil(random(22, 32));
       }
-      
-      int y = (int)floor(random(0, LyricObjects.size()));
-      
-      if(!dontreset)
+
+      if (frameCount % 7 == 0)
+      {      
+        int font = (int)ceil(random(0, LyricFonts.size() - 1));      
+        ActiveLyricObjects[i].ActiveFont = LyricFonts.get(font);
+      }
+
+      if (frameCount % L_WORDTIME == 0)
       {
-        ActiveLyricObjects[i] = LyricObjects.get(y);
-        //chance index
-        ActiveLyricObjects[i].Index = y;
+        word++;
       }
-      else
-        ActiveLyrisObjects[i] = null;      
+
+      if (frameCount % L_SWAPTIME == 0)
+      {
+        ActiveLyricObjects[i].Progress += 1;     
+        word = 0;
+      }
+
+      Boolean dontreset = false;
+      if (frameCount % ALO_SWAPTIME == 0)
+      {
+        //de swap is hier, mss moeten we een object verwijderen
+        if (ActiveLyricObjects[i].Invalidated)
+        {        
+          if (ALO_SHOW != LyricObjects.size())
+          {        
+            LyricObjects.remove(ActiveLyricObjects[i].Index);
+          } else
+            dontreset = true;
+          //no more objects
+
+          if (ALO_SHOW > LyricObjects.size())
+          {
+            ALO_SHOW = LyricObjects.size();
+          }
+        }
+
+        int y = (int)floor(random(0, LyricObjects.size()));
+
+        if (!dontreset)
+        {
+          ActiveLyricObjects[i] = LyricObjects.get(y);
+          //chance index
+          ActiveLyricObjects[i].Index = y;
+        } else
+          ActiveLyricObjects[i] = null;
+      }
     }
   }
 }
@@ -380,7 +388,7 @@ void LoadFonts()
   File dir = new File("M:/Edit/Code/Projects/NR/AnOminousSun/data/fonts");
 
   String[] children = dir.list();    
-  
+
   if (children == null) 
   {
     // Either dir does not exist or is not a directory
@@ -389,9 +397,9 @@ void LoadFonts()
   {    
     for (int i=0; i<children.length; i++) 
     {  
-      LyricFonts.add(createFont("M:/Edit/Code/Projects/NR/AnOminousSun/data/fonts/" + children[i], 16));      
-    }        
-  }  
+      LyricFonts.add(createFont("M:/Edit/Code/Projects/NR/AnOminousSun/data/fonts/" + children[i], 16));
+    }
+  }
 }
 
 void LoadFileList()
@@ -399,7 +407,7 @@ void LoadFileList()
   File dir = new File("M:/Edit/Code/Projects/NR/AnOminousSun/lyrser/");
 
   String[] children = dir.list();  
-  
+
   if (children == null) 
   {
     // Either dir does not exist or is not a directory
@@ -409,20 +417,21 @@ void LoadFileList()
     for (int i=0; i<children.length; i++) 
     {      
       String filename = children[i];
-      
+
       JSONObject a = loadJSONObject("M:/Edit/Code/Projects/NR/AnOminousSun/lyrser/" + filename);      
-      
+
       LyrSerObject b = new LyrSerObject(Float.valueOf(a.getString("Evilness")), a.getString("Genres"), a.getString("Lyrics"));
-      
+
       b.Index = i;
       b.ActiveFont = LyricFonts.get(0);
-            
-      LyricObjects.add(b);      
+
+      LyricObjects.add(b);
     }
   }
 
-  for(int i = 0; i < ALO_SHOW; i++)
+  for (int i = 0; i < ALO_SHOW; i++)
   {
     ActiveLyricObjects[i] = LyricObjects.get(i);
-  }  
+  }
 }
+

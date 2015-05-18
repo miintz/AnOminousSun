@@ -26,7 +26,7 @@ namespace LyrSer
 {
     public partial class ControlCenter : Form
     {
-        String MusixAPI = "";
+        String MusixAPI = "a521cb8d087de3e7978da22b104fd880";
         Dictionary<string, double> GenreEvilness = new Dictionary<string, double>();
         public ControlCenter()
         {
@@ -54,26 +54,33 @@ namespace LyrSer
 
             String MatchedText = String.Empty;
             Bitmap bmp = new Bitmap(widthsize, topsize, PixelFormat.Format32bppArgb);
-                        
+            
             using (Graphics g = Graphics.FromImage(bmp))
             {
                 String ProcName = "ProjectMyScreenApp";
 
-                var proc = Process.GetProcessesByName(ProcName)[0];
-                var rect = new User32.Rect();
+                try
+                {
+                    var proc = Process.GetProcessesByName(ProcName)[0];
+                    var rect = new User32.Rect();
 
-                User32.GetWindowRect(proc.MainWindowHandle, ref rect);
+                    User32.GetWindowRect(proc.MainWindowHandle, ref rect);
 
-                Graphics graphics = Graphics.FromImage(bmp);
-                g.CopyFromScreen(left, top, 0, 0, new Size(widthsize, topsize), CopyPixelOperation.SourceCopy);
+                    Graphics graphics = Graphics.FromImage(bmp);
+                    g.CopyFromScreen(left, top, 0, 0, new Size(widthsize, topsize), CopyPixelOperation.SourceCopy);
+            
+                    //make it a big bigger first
+                    Size si = new Size(bmp.Width * 2, bmp.Height * 2); //bump up the size to increase BlueSimilarity's change of not fudging the text, if it fails anyway we can use MusicBrainz
+                    bmp = ResizeImage(bmp, si);
+
+                    bmp.Save("lastsearch.png");            
+                }
+                catch (Exception exc)
+                {                    
+                    bmp = new Bitmap(Bitmap.FromFile("lastsearch.png"));
+                }
             }
-
-            //make it a big bigger first
-            Size si = new Size(bmp.Width * 2, bmp.Height * 2); //bump up the size to increase BlueSimilarity's change of not fudging the text
-            bmp = ResizeImage(bmp, si);                
-
-            bmp.Save("lastsearch.png");
-
+           
             //2. Open saved image and fork it over to tesseract
             lblMsg.Text = "Using the OCR thing";
             this.Refresh();
@@ -179,6 +186,13 @@ namespace LyrSer
 
             TrackSearch RetrievedTrack = (TrackSearch)JsonConvert.DeserializeObject(json_search, typeof(TrackSearch));        
             
+            if(((String)json_search).Contains("401"))
+            {
+                lblStatus.Text = "401 MAINTENANCE!";
+                lblMsg.Text = "401 MAINTENANCE!"; 
+                return;
+            }
+
             //pak de eerste in de lijst
             int TrackId = 0;
             if (RetrievedTrack.message.body.track_list.Count != 0)
@@ -193,22 +207,24 @@ namespace LyrSer
 
                 return;
             }
-
+            String Lyr = String.Empty;
             if (TrackId != 0)
             {
                 //now we can get the lycs
                 Uri TrackLyrics = new Uri("http://api.musixmatch.com/ws/1.1/track.lyrics.get?apikey=" + MusixAPI + "&track_id=" + TrackId);
                 var json_lyrics = new WebClient().DownloadString(TrackLyrics);
                 
-                //this goes a little bit wrong if there are no lyrics, i cant figure out the nullable types thing so am just gonna try catch this
+                //this goes a little bit wrong if there are no lyrics, i cant figure out the nullable types thing so am just gonna try catch this bugger
                 TrackLyrics RetrievedLyrics;
-                String Lyr = String.Empty;
+               
                 String Copyright = String.Empty;
 
                 try
                 {
                     RetrievedLyrics = (TrackLyrics)JsonConvert.DeserializeObject(json_lyrics, typeof(TrackLyrics)); 
                     Lyr = RetrievedLyrics.message.body.lyrics.lyrics_body;
+
+                    
                     Copyright = RetrievedLyrics.message.body.lyrics.lyrics_copyright;
                 }
                 catch
@@ -226,6 +242,9 @@ namespace LyrSer
                         Lyr = Lyr.Replace("...", "");
 
                         rtLyrics.Text = Lyr;
+
+                        //we need to sanitize the string
+                        Lyr = Regex.Replace(Lyr, @"\s+", " ");
                     }
                     else
                     {
@@ -328,19 +347,11 @@ namespace LyrSer
 
             //now stream lycs to the new file
             using (StreamWriter Writer = new StreamWriter(FileName))
-            {
-                String Complete = String.Empty;
-                //get lines
-
-                foreach(String line in rtLyrics.Lines)
-                {
-                    Complete += line + "\r\n";
-                }
-                
+            {                
                 LyrOut lyr = new LyrOut();
                 lyr.Evilness = lblEvilness.Text.ToString();
                 lyr.Genres = lblGenre.Text.ToString();
-                lyr.Lyrics = Complete;
+                lyr.Lyrics = Lyr;
 
                 //write this as JSON, so we can parse it later on in any language
                 string output = JsonConvert.SerializeObject(lyr);
