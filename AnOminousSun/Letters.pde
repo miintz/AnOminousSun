@@ -44,7 +44,6 @@ class Letters implements AppletInterface
       }
     }
     
-    image(Mask,0,0);
   }
 
   void initialize() {

@@ -46,8 +46,6 @@ class Octo implements AppletInterface
 
     background(255);
     
-    image(Mask, 0, 0);
-    
     for (int i=0; i<count; i++) {
       particles[i].update();
     }

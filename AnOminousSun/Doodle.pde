@@ -59,7 +59,7 @@ class Doodle implements AppletInterface
       }
     }
     
-    image(Mask,0,0);
+    
   }
 
 

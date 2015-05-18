@@ -119,9 +119,7 @@ public class Fabric implements AppletInterface
     }
 
     if (millis() < instructionLength)
-      drawInstructions();
-      
-    image(Mask,0,0);
+      drawInstructions();      
       
   }
 

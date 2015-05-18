@@ -63,8 +63,7 @@ class BodyCells implements AppletInterface
 
   void draw() {
     render();
-    //pleur er maar een mask overheen
-    image(Mask,0,0);
+    
   }
 
   void keyReleased() {}
@@ -91,8 +90,8 @@ class BodyCells implements AppletInterface
       de.synchronize();
       
       vo.synchronize();
-      vo.render();
       
+      vo.render();      
       cl.render();
       
       pg.popMatrix();
@@ -1779,18 +1778,10 @@ class BodyCells implements AppletInterface
       if (npoints<3) return;
         pg.beginShape();
 
-      int y = 0;
-      int x = 0;
-
-      int Cx = width / 2;
-      int Cy = height / 2;
-
-      int radius = width / 2;
-      
       for (int i=0; i<npoints; i++) 
       {        
         //als een x aantal punten buiten de cirkel ligt, hele ding niet tekenen? of gewoon niet de vertices, krijg je vreemde cellen
-        println(points[i].x, points[i].y);
+        
         pg.vertex(points[i].x, points[i].y, points[i].z);
       }
   
@@ -1805,6 +1796,7 @@ class BodyCells implements AppletInterface
     void render(String $type) {
       if (npoints<3) return;
       pg.beginShape();
+      
       if ($type=="line") {
         for (int i=0; i<npoints; i++) {
           pg.vertex(points[i].x, points[i].y, points[i].z);
@@ -1823,6 +1815,7 @@ class BodyCells implements AppletInterface
           pg.bezierVertex(points[i].x, points[i].y, points[i].z, points[i].x, points[i].y, points[i].z, (points[(i+1)%npoints].x+points[i].x)/2, (points[(i+1)%npoints].y+points[i].y)/2, (points[(i+1)%npoints].z+points[i].z)/2);
         }
       }
+      
       pg.endShape(CLOSE);
       /*
     for(int i=0;i<npoints;i++){

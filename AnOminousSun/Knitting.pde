@@ -25,7 +25,7 @@ class Knitting implements AppletInterface
   String ts;
   
   boolean first = true;  
-  boolean enabled = false;  
+  boolean enabled = true;  
   boolean MODIFY_ANGLE = true;
   
   // parameters (play here)
@@ -46,7 +46,7 @@ class Knitting implements AppletInterface
     imin = 0;
     
     background(255);
-    smooth();
+    smooth();      
   }
   
   void draw() {
@@ -111,8 +111,7 @@ class Knitting implements AppletInterface
       }
     }
     
-    image(Mask, 0, 0);
-    
+    filter(GRAY);
   }
   
   void keyPressed()

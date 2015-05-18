@@ -125,7 +125,6 @@ class Waver implements AppletInterface
       rect(-10, -10, width, height);
     }
     
-    image(Mask,0,0);
   }
 
   void myLine() {

@@ -38,9 +38,7 @@ class NoiseField implements AppletInterface
     }
 
     p.update();
-    p.render();
-    
-    image(Mask, 0,0);
+    p.render();    
   }
 
   void keyPressed()

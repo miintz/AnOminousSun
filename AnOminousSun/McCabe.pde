@@ -48,9 +48,11 @@ class McCabe implements AppletInterface
 
   boolean colMode = true;
   boolean invertMode = false;
-  int resolution = 2;
+  
+  int resolution = 3;
   int spacing = 20;
   int brush = 2;
+  
   float stepOffsetMin = .001;
   float stepOffsetMax = .2;
   float stepScaleMin = .001;
@@ -81,9 +83,7 @@ class McCabe implements AppletInterface
     
     //drawControls();
     interaction();  
-    // if(frameCount % 20 == 0) frameRate);
-    
-    image(Mask, 0,0);
+    // if(frameCount % 20 == 0) frameRate);           
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -585,7 +585,7 @@ class McCabe implements AppletInterface
   float stepScale = .01;
   float stepOffset = .01;
   float blurFactor = 1.0;
-  int symmetry = 0;
+  int symmetry = 4;
   int colorOffset = 0;
 
 
