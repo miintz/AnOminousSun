@@ -26,7 +26,14 @@ namespace LyrSer
 {
     public partial class ControlCenter : Form
     {
-        String MusixAPI = "";
+        [DllImport("User32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool ShowWindow(IntPtr hWnd, ShowWindowCommands nCmdShow);
+
+        String MusixAPI = "a521cb8d087de3e7978da22b104fd880";
         Dictionary<string, double> GenreEvilness = new Dictionary<string, double>();
         public ControlCenter()
         {
@@ -36,8 +43,20 @@ namespace LyrSer
         }
 
         private void btnReadText_Click(object sender, EventArgs e)
-        {           
-            //1. Get screenshot from projected phone            
+        {//ProjectMyScreenApp.exe
+            Process[] foundProcesses = Process.GetProcessesByName("ProjectMyScreenApp");
+
+            if (foundProcesses.Length != 0)
+            {
+                foreach (Process p in foundProcesses)
+                {
+                    SetForegroundWindow(p.MainWindowHandle);
+                    ShowWindow(p.MainWindowHandle, ShowWindowCommands.ShowMaximized);
+                    SendKeys.Send("%{ENTER}");
+                }
+            }
+
+            //1. Get screenshot from projected phone                        
             lblMsg.Text = "Getting Screenshot";
             rtLyrics.Text = ""; //reset this
             rtMatched.Text = ""; //and this
@@ -53,49 +72,63 @@ namespace LyrSer
             int top = 365;
 
             String MatchedText = String.Empty;
+            String SongName = String.Empty;
+            String[] Lines = new String[2];
             Bitmap bmp = new Bitmap(widthsize, topsize, PixelFormat.Format32bppArgb);
-                        
-            using (Graphics g = Graphics.FromImage(bmp))
+
+            if (!chk_debug.Checked)
             {
-                String ProcName = "ProjectMyScreenApp";
-
-                var proc = Process.GetProcessesByName(ProcName)[0];
-                var rect = new User32.Rect();
-
-                User32.GetWindowRect(proc.MainWindowHandle, ref rect);
-
-                Graphics graphics = Graphics.FromImage(bmp);
-                g.CopyFromScreen(left, top, 0, 0, new Size(widthsize, topsize), CopyPixelOperation.SourceCopy);
-            }
-
-            //make it a big bigger first
-            Size si = new Size(bmp.Width * 2, bmp.Height * 2); //bump up the size to increase BlueSimilarity's change of not fudging the text
-            bmp = ResizeImage(bmp, si);                
-
-            bmp.Save("lastsearch.png");
-
-            //2. Open saved image and fork it over to tesseract
-            lblMsg.Text = "Using the OCR thing";
-            this.Refresh();
-
-            using (var engine = new TesseractEngine("tesseract-ocr", "eng", EngineMode.Default))
-            {
-                using (var pix = PixConverter.ToPix(bmp))
+                using (Graphics g = Graphics.FromImage(bmp))
                 {
-                    using (var page = engine.Process(pix))
+                    String ProcName = "ProjectMyScreenApp";
+                    
+                    var proc = Process.GetProcessesByName(ProcName)[0];
+                    var rect = new User32.Rect();
+
+                    User32.GetWindowRect(proc.MainWindowHandle, ref rect);
+
+                    Graphics graphics = Graphics.FromImage(bmp);
+                    g.CopyFromScreen(left, top, 0, 0, new Size(widthsize, topsize), CopyPixelOperation.SourceCopy);
+                }
+
+                //make it a big bigger first
+                Size si = new Size(bmp.Width * 2, bmp.Height * 2); //bump up the size to increase BlueSimilarity's change of not fudging the text
+                bmp = ResizeImage(bmp, si);
+
+                bmp.Save("lastsearch.png");
+
+                //2. Open saved image and fork it over to tesseract
+                lblMsg.Text = "Using the OCR thing";
+                this.Refresh();
+
+                using (var engine = new TesseractEngine("tesseract-ocr", "eng", EngineMode.Default))
+                {
+                    using (var pix = PixConverter.ToPix(bmp))
                     {
-                        //3. Get matched text from tesseract
-                        lblConfidence.Text = "Confidence: " + page.GetMeanConfidence(); //if this is > 0.85 then its probably OK
-                            
-                        MatchedText = page.GetText();
-                        rtMatched.Text = MatchedText;
+                        using (var page = engine.Process(pix))
+                        {
+                            //3. Get matched text from tesseract
+                            lblConfidence.Text = "Confidence: " + page.GetMeanConfidence(); //if this is > 0.85 then its probably OK
+
+                            MatchedText = page.GetText();
+                            rtMatched.Text = MatchedText;
+                        }
                     }
                 }
-            }            
 
-            String[] Lines = MatchedText.Split(new char[] { '\n' });
+                 Lines = MatchedText.Split(new char[] { '\n' });
+                 SongName = Lines[0];
+            }
+            else
+            {
+                Lines[0] = "The Circular Ruins";
+                Lines[1] = "At The Gates";
 
-            String SongName = Lines[0];
+                SongName = Lines[0];
+
+                rtMatched.Text = Lines[0] + " " + Lines[1];
+            }
+
 
             //i also need to get rid of half words, else musixmatch wont match. but first i need to know if the last char is a dot
             if (SongName[SongName.Length - 1] == '.')
@@ -429,7 +462,80 @@ namespace LyrSer
     }
 
     //PInvoke meuk
-     class User32
+
+    enum ShowWindowCommands
+    {
+        /// <summary>
+        /// Hides the window and activates another window.
+        /// </summary>
+        Hide = 0,
+        /// <summary>
+        /// Activates and displays a window. If the window is minimized or 
+        /// maximized, the system restores it to its original size and position.
+        /// An application should specify this flag when displaying the window 
+        /// for the first time.
+        /// </summary>
+        Normal = 1,
+        /// <summary>
+        /// Activates the window and displays it as a minimized window.
+        /// </summary>
+        ShowMinimized = 2,
+        /// <summary>
+        /// Maximizes the specified window.
+        /// </summary>
+        Maximize = 3, // is this the right value?
+        /// <summary>
+        /// Activates the window and displays it as a maximized window.
+        /// </summary>       
+        ShowMaximized = 3,
+        /// <summary>
+        /// Displays a window in its most recent size and position. This value 
+        /// is similar to <see cref="Win32.ShowWindowCommand.Normal"/>, except 
+        /// the window is not activated.
+        /// </summary>
+        ShowNoActivate = 4,
+        /// <summary>
+        /// Activates the window and displays it in its current size and position. 
+        /// </summary>
+        Show = 5,
+        /// <summary>
+        /// Minimizes the specified window and activates the next top-level 
+        /// window in the Z order.
+        /// </summary>
+        Minimize = 6,
+        /// <summary>
+        /// Displays the window as a minimized window. This value is similar to
+        /// <see cref="Win32.ShowWindowCommand.ShowMinimized"/>, except the 
+        /// window is not activated.
+        /// </summary>
+        ShowMinNoActive = 7,
+        /// <summary>
+        /// Displays the window in its current size and position. This value is 
+        /// similar to <see cref="Win32.ShowWindowCommand.Show"/>, except the 
+        /// window is not activated.
+        /// </summary>
+        ShowNA = 8,
+        /// <summary>
+        /// Activates and displays the window. If the window is minimized or 
+        /// maximized, the system restores it to its original size and position. 
+        /// An application should specify this flag when restoring a minimized window.
+        /// </summary>
+        Restore = 9,
+        /// <summary>
+        /// Sets the show state based on the SW_* value specified in the 
+        /// STARTUPINFO structure passed to the CreateProcess function by the 
+        /// program that started the application.
+        /// </summary>
+        ShowDefault = 10,
+        /// <summary>
+        ///  <b>Windows 2000/XP:</b> Minimizes a window, even if the thread 
+        /// that owns the window is not responding. This flag should only be 
+        /// used when minimizing windows from a different thread.
+        /// </summary>
+        ForceMinimize = 11
+    }
+
+    class User32
     {
         [StructLayout(LayoutKind.Sequential)]
         public struct Rect

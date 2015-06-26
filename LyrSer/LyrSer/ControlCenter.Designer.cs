@@ -41,6 +41,7 @@
             this.lblMsg = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.lblOutFileN = new System.Windows.Forms.Label();
+            this.chk_debug = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // btnReadText
@@ -157,11 +158,22 @@
             this.lblOutFileN.TabIndex = 12;
             this.lblOutFileN.Text = "0";
             // 
+            // chk_debug
+            // 
+            this.chk_debug.AutoSize = true;
+            this.chk_debug.Location = new System.Drawing.Point(99, 17);
+            this.chk_debug.Name = "chk_debug";
+            this.chk_debug.Size = new System.Drawing.Size(102, 17);
+            this.chk_debug.TabIndex = 13;
+            this.chk_debug.Text = "No phone mode";
+            this.chk_debug.UseVisualStyleBackColor = true;
+            // 
             // ControlCenter
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(680, 649);
+            this.Controls.Add(this.chk_debug);
             this.Controls.Add(this.lblOutFileN);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.lblMsg);
@@ -197,6 +209,7 @@
         private System.Windows.Forms.Label lblMsg;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label lblOutFileN;
+        private System.Windows.Forms.CheckBox chk_debug;
     }
 }
 
