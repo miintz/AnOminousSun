@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -36,7 +36,7 @@ namespace LyrSer
         }
 
         private void btnReadText_Click(object sender, EventArgs e)
-        {           
+        {
             //1. Get screenshot from projected phone            
             lblMsg.Text = "Getting Screenshot";
             rtLyrics.Text = ""; //reset this
@@ -54,7 +54,7 @@ namespace LyrSer
 
             String MatchedText = String.Empty;
             Bitmap bmp = new Bitmap(widthsize, topsize, PixelFormat.Format32bppArgb);
-            
+
             using (Graphics g = Graphics.FromImage(bmp))
             {
                 String ProcName = "ProjectMyScreenApp";
@@ -68,19 +68,19 @@ namespace LyrSer
 
                     Graphics graphics = Graphics.FromImage(bmp);
                     g.CopyFromScreen(left, top, 0, 0, new Size(widthsize, topsize), CopyPixelOperation.SourceCopy);
-            
+
                     //make it a big bigger first
                     Size si = new Size(bmp.Width * 2, bmp.Height * 2); //bump up the size to increase BlueSimilarity's change of not fudging the text, if it fails anyway we can use MusicBrainz
                     bmp = ResizeImage(bmp, si);
 
-                    bmp.Save("lastsearch.png");            
+                    bmp.Save("lastsearch.png");
                 }
                 catch (Exception exc)
-                {                    
+                {
                     bmp = new Bitmap(Bitmap.FromFile("lastsearch.png"));
                 }
             }
-           
+
             //2. Open saved image and fork it over to tesseract
             lblMsg.Text = "Using the OCR thing";
             this.Refresh();
@@ -93,12 +93,12 @@ namespace LyrSer
                     {
                         //3. Get matched text from tesseract
                         lblConfidence.Text = "Confidence: " + page.GetMeanConfidence(); //if this is > 0.85 then its probably OK
-                            
+
                         MatchedText = page.GetText();
                         rtMatched.Text = MatchedText;
                     }
                 }
-            }            
+            }
 
             String[] Lines = MatchedText.Split(new char[] { '\n' });
 
@@ -113,27 +113,27 @@ namespace LyrSer
                 while (!SpaceHit)
                 {
                     SongName = SongName.Remove(SongName.Length - 1);
-                    if (SongName[SongName.Length - 1] == ' ') 
+                    if (SongName[SongName.Length - 1] == ' ')
                         SpaceHit = true;
                 }
             }
 
-            String BandName = Lines[1];  
+            String BandName = Lines[1];
 
             //3.1 sometimes the artist name get fudged a little (because of Shazam's gray font), so query MusicBrainz to see if it is correct
             lblMsg.Text = "Querying MusicBrainz for meta data";
             this.Refresh();
 
-            Uri BrainzUri = new Uri("https://musicbrainz.org/search?query="+BandName+"&type=artist&method=indexed");
+            Uri BrainzUri = new Uri("https://musicbrainz.org/search?query=" + BandName + "&type=artist&method=indexed");
 
             String BrainzContentArtist;
             try
             {
-                String BrainzContent = new WebClient().DownloadString(BrainzUri); 
-                
+                String BrainzContent = new WebClient().DownloadString(BrainzUri);
+
                 String BrainzContent1 = Regex.Split(BrainzContent, "<table class=\"tbl\">")[1]; String BrainzContent2 = Regex.Split(BrainzContent1, "</table>")[0]; String BrainzContentPart = Regex.Split(BrainzContent2, "<tbody>")[1]; String BrainzContentPart1 = Regex.Split(BrainzContentPart, "<bdi>")[1]; BrainzContentArtist = Regex.Split(BrainzContentPart1, "</bdi>")[0];
             }
-            catch(Exception E)
+            catch (Exception E)
             {
                 //sometimes this throws an 502, bad gateway error, so we need to compenstate for that in some way
                 BrainzContentArtist = BandName;
@@ -169,14 +169,14 @@ namespace LyrSer
                 ArtistJson = client.DownloadString(ArtistUri);
 
                 //3.4 if we have a Json we can deserialize this into the object, this may throw error if we get the Bad Gateway page (that's not Json)
-                RetrievedArtistObject = (MusicBrainzArtist)JsonConvert.DeserializeObject(ArtistJson, typeof(MusicBrainzArtist));        
+                RetrievedArtistObject = (MusicBrainzArtist)JsonConvert.DeserializeObject(ArtistJson, typeof(MusicBrainzArtist));
 
             }
-            catch(Exception E)
+            catch (Exception E)
             {
                 //again, catch 502 and 503 error
             }
-            
+
             //4. Query musixmatch
             lblMsg.Text = "Querying Musixmatch for the lyrics";
             this.Refresh();
@@ -184,12 +184,12 @@ namespace LyrSer
             Uri TrackSearch = new Uri("http://api.musixmatch.com/ws/1.1/track.search?apikey=" + MusixAPI + "&q_artist=" + BandName + "&q_track=" + SongName);
             var json_search = new WebClient().DownloadString(TrackSearch);
 
-            TrackSearch RetrievedTrack = (TrackSearch)JsonConvert.DeserializeObject(json_search, typeof(TrackSearch));        
-            
-            if(((String)json_search).Contains("401"))
+            TrackSearch RetrievedTrack = (TrackSearch)JsonConvert.DeserializeObject(json_search, typeof(TrackSearch));
+
+            if (((String)json_search).Contains("401"))
             {
                 lblStatus.Text = "401 MAINTENANCE!";
-                lblMsg.Text = "401 MAINTENANCE!"; 
+                lblMsg.Text = "401 MAINTENANCE!";
                 return;
             }
 
@@ -213,18 +213,18 @@ namespace LyrSer
                 //now we can get the lycs
                 Uri TrackLyrics = new Uri("http://api.musixmatch.com/ws/1.1/track.lyrics.get?apikey=" + MusixAPI + "&track_id=" + TrackId);
                 var json_lyrics = new WebClient().DownloadString(TrackLyrics);
-                
+
                 //this goes a little bit wrong if there are no lyrics, i cant figure out the nullable types thing so am just gonna try catch this bugger
                 TrackLyrics RetrievedLyrics;
-               
+
                 String Copyright = String.Empty;
 
                 try
                 {
-                    RetrievedLyrics = (TrackLyrics)JsonConvert.DeserializeObject(json_lyrics, typeof(TrackLyrics)); 
+                    RetrievedLyrics = (TrackLyrics)JsonConvert.DeserializeObject(json_lyrics, typeof(TrackLyrics));
                     Lyr = RetrievedLyrics.message.body.lyrics.lyrics_body;
 
-                    
+
                     Copyright = RetrievedLyrics.message.body.lyrics.lyrics_copyright;
                 }
                 catch
@@ -232,7 +232,7 @@ namespace LyrSer
                     return;
                 }
 
-                
+
                 if (Copyright != "Unfortunately we're not authorized to show these lyrics.")
                 {
                     if (Lyr != null && Lyr != "")
@@ -266,7 +266,7 @@ namespace LyrSer
             //5. cool, now we have the lyrics. Save these to a file so the visualizer can read it
             //before we do this however, we need to get the genres so we can calculate the level of "evilness"
             //we could analyse the lyrics... buuuuut we're just gonna look at the genres for now, its in the RetrievedTrack object somewhere
-            
+
             double Evilness = 0.0;
             double Genre = 0.0;
 
@@ -289,7 +289,7 @@ namespace LyrSer
                         }
                     }
 
-                    Evilness = Evilness / Genre; 
+                    Evilness = Evilness / Genre;
                     Evilness = Math.Round(Evilness, 2);
                 }
             }
@@ -310,44 +310,44 @@ namespace LyrSer
             String Latest = String.Empty;
 
             if (!Directory.Exists("./LyrOut/"))
-            { 
+            {
                 //ok, so this doesnt exist. ezpz then
                 Directory.CreateDirectory("./LyrOut/");
 
                 //also write 10 files for the lyrics so the next bit is a little easier
                 for (int i = 0; i < 10; i++)
-                {                    
+                {
                     FileStream outf = System.IO.File.Create("./LyrOut/lyrout-" + i.ToString() + ".txt");
                     outf.Close(); //we need to close this now
                 }
             }
             else
-            {                
+            {
                 //get oldest files
                 FileInfo fileinf = new DirectoryInfo("./LyrOut/").EnumerateFiles().OrderByDescending(x => x.LastWriteTime).Reverse().ToList().First();
- 
+
                 //seems as if we took the second route
-                String[] parts = fileinf.Name.Split(new char[] { '-' } );
-               
+                String[] parts = fileinf.Name.Split(new char[] { '-' });
+
                 //split again
                 String[] parts1 = parts[1].Split(new char[] { '.' });
 
                 //first part should be theadnumber
-                ThreadNumber = Int32.Parse(parts1[0]);                
+                ThreadNumber = Int32.Parse(parts1[0]);
             }
 
             //now we should have the theadnumber one way or another, we can write to file now
 
             //so... write to file, but first create it!
             String FileName = "./LyrOut/lyrout-" + ThreadNumber.ToString() + ".txt";
-            FileStream f = System.IO.File.Create(FileName); 
+            FileStream f = System.IO.File.Create(FileName);
             f.Close(); //we need to close this
-          
-            lblOutFileN.Text = ThreadNumber.ToString(); 
+
+            lblOutFileN.Text = ThreadNumber.ToString();
 
             //now stream lycs to the new file
             using (StreamWriter Writer = new StreamWriter(FileName))
-            {                
+            {
                 LyrOut lyr = new LyrOut();
                 lyr.Evilness = lblEvilness.Text.ToString();
                 lyr.Genres = lblGenre.Text.ToString();
@@ -360,7 +360,7 @@ namespace LyrSer
                 Writer.Close();
                 Writer.Dispose();
             }
-            
+
             //done writing lyrics
 
             lblMsg.Text = "OK!";
@@ -374,7 +374,7 @@ namespace LyrSer
         /// <param name="size"></param>
         /// <returns></returns>
         public static Bitmap ResizeImage(Bitmap imgToResize, Size size)
-        {            
+        {
             Bitmap b = new Bitmap(size.Width, size.Height);
 
             using (Graphics g = Graphics.FromImage((Image)b))
@@ -383,13 +383,13 @@ namespace LyrSer
                 g.DrawImage(imgToResize, 0, 0, size.Width, size.Height);
             }
 
-            return b;           
+            return b;
         }
-        
+
         private void PopulateGenreEvilnessList()
         {
             //populate the evilness list, 0.00 = fluffy bunny / 10.00 = antichrist
-            
+
             //metal genres
             GenreEvilness.Add("death metal", 8.5);
             GenreEvilness.Add("melodic death metal", 7.5);
@@ -440,7 +440,7 @@ namespace LyrSer
     }
 
     //PInvoke meuk
-     class User32
+    class User32
     {
         [StructLayout(LayoutKind.Sequential)]
         public struct Rect
