@@ -30,6 +30,8 @@
         {
             this.btnFindSong = new System.Windows.Forms.Button();
             this.btnPlayPause = new System.Windows.Forms.Button();
+            this.txt_spotid = new System.Windows.Forms.TextBox();
+            this.btn_findbyid = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnFindSong
@@ -52,16 +54,36 @@
             this.btnPlayPause.UseVisualStyleBackColor = true;
             this.btnPlayPause.Click += new System.EventHandler(this.btnPlayPause_Click);
             // 
+            // txt_spotid
+            // 
+            this.txt_spotid.Location = new System.Drawing.Point(86, 92);
+            this.txt_spotid.Name = "txt_spotid";
+            this.txt_spotid.Size = new System.Drawing.Size(100, 20);
+            this.txt_spotid.TabIndex = 4;
+            // 
+            // btn_findbyid
+            // 
+            this.btn_findbyid.Location = new System.Drawing.Point(5, 89);
+            this.btn_findbyid.Name = "btn_findbyid";
+            this.btn_findbyid.Size = new System.Drawing.Size(75, 23);
+            this.btn_findbyid.TabIndex = 5;
+            this.btn_findbyid.Text = "Find by ID";
+            this.btn_findbyid.UseVisualStyleBackColor = true;
+            this.btn_findbyid.Click += new System.EventHandler(this.btn_findbyid_Click);
+            // 
             // SonSer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(527, 306);
+            this.Controls.Add(this.btn_findbyid);
+            this.Controls.Add(this.txt_spotid);
             this.Controls.Add(this.btnPlayPause);
             this.Controls.Add(this.btnFindSong);
             this.Name = "SonSer";
             this.Text = "Form1";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -69,6 +91,8 @@
 
         private System.Windows.Forms.Button btnFindSong;
         private System.Windows.Forms.Button btnPlayPause;
+        private System.Windows.Forms.TextBox txt_spotid;
+        private System.Windows.Forms.Button btn_findbyid;
     }
 }
 

@@ -1,27 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 using System.Windows.Forms;
+using System.Data;
+using System.Drawing;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Drawing.Imaging;
 
 using Tesseract;
+using System.Text.RegularExpressions;
 
-namespace SonSer
+namespace SonSerC
 {
-    public partial class SonSer : Form
-    {        
-        public SonSer()
-        {           
-            InitializeComponent();
-        }
-
+    class Program
+    {
         [DllImport("User32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
@@ -34,115 +30,182 @@ namespace SonSer
 
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         public static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
-        
+
         public const int MOUSEEVENTF_LEFTDOWN = 0x02;
         public const int MOUSEEVENTF_LEFTUP = 0x04;
 
-        Process rp = null;
+        static string TrackRegex = "spotify:track:([a-zA-Z0-9]{22})";
+        static string AlbumRegex = "spotify:album:([a-zA-Z0-9]{22})";
 
-        private Process FocusSpotify(bool r = false)
-        {
-            Process[] processlist = Process.GetProcesses();
-            if (rp == null)
+        static void Main(string[] args)
+        {                   
+            //negeer alle args vanaf 2
+            try
             {
-                foreach (Process p in processlist)
-                {
-                    String name = p.MainWindowTitle;
-                    if (name == "Spotify")
-                    {
-                        rp = p;
+                string arg = args[0];                
+
+                switch (arg)
+                { 
+                    case "play":
+                    case "pause":
+                        FocusSpotify(false);
+                        PausePlaySpotify();                    
                         break;
-                    }
+                    case "start":
+                        string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Spotify\\Spotify.exe";
+                        Process.Start(path); //start spotify hiero, werkt alleen voor standaard pad...
+                        System.Threading.Thread.Sleep(1000);
+
+                        FocusSpotify();
+                        break;
+                    default:
+                        //mogelijk een trackid/albumid ofzo
+
+                        Match Album = Regex.Match(arg, AlbumRegex);
+                        Match Track = Regex.Match(arg, TrackRegex);
+
+                        if (Album.Length != 0)
+                        {
+                            FocusSpotify(false, true);
+
+                            SelectSearchbarSpotify();
+                            TypeSpotify(arg);
+
+                            SendKeys.SendWait("{ENTER}");
+
+                            ClickClearSearchSpotify();
+
+                            //beweeg cursor naar groene dingens
+                            ClickDoubleDelaySpotify(575, 400);    
+                        }
+                        else if (Track.Length != 0)
+                        {
+                            FocusSpotify(false, true);
+
+                            SelectSearchbarSpotify();
+                            TypeSpotify(arg);
+
+                            SendKeys.SendWait("{ENTER}");
+
+                            ClickClearSearchSpotify();
+                        }
+                        else
+                        { 
+                            //niks
+                            Application.Exit();
+                        }
+
+                    break;
                 }
+
+
+            }
+            catch (ArgumentOutOfRangeException E)
+            {
+                //Nope nope nope nope. Geen args
+                Application.Exit();
             }
 
-            SetForegroundWindow(rp.MainWindowHandle);
-            ShowWindow(rp.MainWindowHandle, ShowWindowCommands.ShowMaximized);
 
-            if(r)
-                return rp;
+        }
+
+        static private Process FocusSpotify(bool r = false, bool pause = false)
+        {
+            //soms is de windowtitle helemaal leeg ?
+            Process SPOTIFY = Process.GetProcessesByName("Spotify").FirstOrDefault(p => p.MainWindowTitle != "");
+
+            SetForegroundWindow(SPOTIFY.MainWindowHandle);
+            ShowWindow(SPOTIFY.MainWindowHandle, ShowWindowCommands.ShowMaximized);
+
+            string Name = SPOTIFY.MainWindowTitle;
+            if (Name != "Spotify")
+            { 
+                //pauzeer eerst, anders doet de trackid + enter niks (vreemd) doe niet als arg play of pause is.
+                if(pause)
+                    PausePlaySpotify();
+            }
+
+            if (r)
+                return SPOTIFY;
             else
-                return null;           
+                return null;
+
         }
 
-        private void ClickSpotify(int xpos, int ypos)
+        private static void ClickSpotify(int xpos, int ypos)
         {
             SetCursorPos(xpos, ypos);
             mouse_event(MOUSEEVENTF_LEFTDOWN, xpos, ypos, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTUP, xpos, ypos, 0, 0);
         }
-        private void ClickDoubleSpotify(int xpos, int ypos)
+        private static void ClickDoubleSpotify(int xpos, int ypos)
         {
             SetCursorPos(xpos, ypos);
-            mouse_event(MOUSEEVENTF_LEFTDOWN, xpos, ypos, 0, 0);
-            mouse_event(MOUSEEVENTF_LEFTUP, xpos, ypos, 0, 0);
-            mouse_event(MOUSEEVENTF_LEFTDOWN, xpos, ypos, 0, 0);
-            mouse_event(MOUSEEVENTF_LEFTUP, xpos, ypos, 0, 0);
-        }
-
-        private void ClickDoubleDelaySpotify(int xpos, int ypos)
-        {
-            SetCursorPos(xpos, ypos);
-            System.Threading.Thread.Sleep(500);
             mouse_event(MOUSEEVENTF_LEFTDOWN, xpos, ypos, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTUP, xpos, ypos, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTDOWN, xpos, ypos, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTUP, xpos, ypos, 0, 0);
         }
 
-        private void ClickDelaySpotify(int xpos, int ypos)
+        private static void ClickDoubleDelaySpotify(int xpos, int ypos)
         {
             SetCursorPos(xpos, ypos);
             System.Threading.Thread.Sleep(500);
             mouse_event(MOUSEEVENTF_LEFTDOWN, xpos, ypos, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTUP, xpos, ypos, 0, 0);
+            mouse_event(MOUSEEVENTF_LEFTDOWN, xpos, ypos, 0, 0);
+            mouse_event(MOUSEEVENTF_LEFTUP, xpos, ypos, 0, 0);
         }
 
-        public void PausePlaySpotify()
+        private static void ClickDelaySpotify(int xpos, int ypos)
         {
+            SetCursorPos(xpos, ypos);
+            System.Threading.Thread.Sleep(500);
+            mouse_event(MOUSEEVENTF_LEFTDOWN, xpos, ypos, 0, 0);
+            mouse_event(MOUSEEVENTF_LEFTUP, xpos, ypos, 0, 0);
+        }
+
+        public static void PausePlaySpotify()
+        {
+            Console.WriteLine("b");
             ClickDelaySpotify(75, 1000);
         }
 
-        private void ClickClearSearchSpotify()
+        private static void ClickClearSearchSpotify()
         {
             ClickDelaySpotify(315, 70);
         }
-        
-        private void SelectSearchbarSpotify()
+
+        private static void SelectSearchbarSpotify()
         {
             ClickDelaySpotify(125, 75);
         }
 
-        private void SelectAllResults()
+        private static void SelectAllResults()
         {
             System.Threading.Thread.Sleep(500);
             ClickSpotify(125, 125);
         }
 
-        private void PlayFromResultsScreen()
+        private static void PlayFromResultsScreen()
         {
             System.Threading.Thread.Sleep(1000);
             ClickDelaySpotify(305, 200);
         }
 
-        private void PlayFromResultsLowerScreen()
+        private static void PlayFromResultsLowerScreen()
         {
             System.Threading.Thread.Sleep(1000);
             ClickDelaySpotify(300, 450);
         }
 
-        private void PressEnterSpotify()
-        {
-            SendKeys.Send("{ENTER}");
-        }
-
-        private void TypeSpotify(string p)
+        private static void TypeSpotify(string p)
         {
             char[] keys = p.ToArray<char>();
 
             foreach (char key in keys)
-            {
-                SendKeys.Send(key.ToString());
+            {                
+                SendKeys.SendWait(key.ToString());
             }
         }
 
@@ -156,8 +219,8 @@ namespace SonSer
             Bitmap bmp = new Bitmap(widthsize, topsize, PixelFormat.Format32bppArgb);
 
             using (Graphics g = Graphics.FromImage(bmp))
-            {                
-                var rect = new User32.Rect();                
+            {
+                var rect = new User32.Rect();
                 User32.GetWindowRect(FocusSpotify(true).MainWindowHandle, ref rect);
 
                 Graphics graphics = Graphics.FromImage(bmp);
@@ -179,7 +242,7 @@ namespace SonSer
                     using (var page = engine.Process(pix))
                     {
                         //3. Get matched text from tesseract                        
-                        MatchedText = page.GetText();                        
+                        MatchedText = page.GetText();
                     }
                 }
             }
@@ -188,59 +251,6 @@ namespace SonSer
             String Word = Lines[0];
 
             return Word;
-        }
-
-        private void btnFindSong_Click(object sender, EventArgs e)
-        {
-            FocusSpotify();
-            
-            System.Threading.Thread.Sleep(1000);
-            
-            SelectSearchbarSpotify();
-            TypeSpotify("Drudkh Cursed Sons, Pt 1");
-            
-            System.Threading.Thread.Sleep(1000);
-
-            SelectAllResults();
-            
-            System.Threading.Thread.Sleep(500);
-            String i = SeeifAlbumsInSearchResults();
-
-            if(i == "ALBUMS")
-                PlayFromResultsLowerScreen();
-            else
-                PlayFromResultsScreen();
-
-            ClickClearSearchSpotify();            
-        }
-
-        private void btn_findbyid_Click(object sender, EventArgs e)
-        {
-            FocusSpotify();
-
-            System.Threading.Thread.Sleep(1000);
-
-            SelectSearchbarSpotify();
-            TypeSpotify(txt_spotid.Text);
-
-            System.Threading.Thread.Sleep(1000);
-
-
-            SendKeys.Send("{ENTER}");
-            //SelectAllResults();
-
-
-            //System.Threading.Thread.Sleep(500);
-
-            ClickClearSearchSpotify();
-
-            //spotify:track:1luuwYOjl3CuLWsIP4zDXW
-        }        
-
-        private void btnPlayPause_Click(object sender, EventArgs e)
-        {
-            FocusSpotify();
-            PausePlaySpotify();
         }
 
         public static Bitmap ResizeImage(Bitmap imgToResize, Size size)
@@ -255,22 +265,5 @@ namespace SonSer
 
             return b;
         }
-
-       
-    }
-
-    class User32
-    {
-        [StructLayout(LayoutKind.Sequential)]
-        public struct Rect
-        {
-            public int left;
-            public int top;
-            public int right;
-            public int bottom;
-        }
-
-        [DllImport("user32.dll")]
-        public static extern IntPtr GetWindowRect(IntPtr hWnd, ref Rect rect);
     }
 }
