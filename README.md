@@ -10,4 +10,4 @@ Uses these beauties: <br/>
 <a href="https://musicbrainz.org/doc/Development/XML_Web_Service/Version_2"> MusicBrainz music metadatabase </a> <br/>
 <a href="https://developer.musixmatch.com/">Musixmatch lyrics database</a>
 
-
+Very much a work in progress, doesn't do much in it's current state!
